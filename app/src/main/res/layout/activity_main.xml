@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.test.idinputmethod.MainActivity"
+    >
+
+  <com.anrongtec.idinputmethod.IDInputEditText
+      android:id="@+id/et"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      />
+
+  <EditText
+      android:id="@+id/et2"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@+id/et"
+
+      />
+  <EditText
+      android:id="@+id/et3"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@+id/et2"
+      />
+
+  <com.anrongtec.idinputmethod.IDInputMethod
+      android:id="@+id/idinputview"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/keyboard_background"
+      android:focusable="true"
+      android:focusableInTouchMode="true"
+      android:keyBackground="@drawable/key_background"
+      android:keyTextColor="@color/keyboard_key_text_color"
+      android:keyTextSize="@dimen/keyboard_text_size"
+      android:paddingTop="1px"
+      android:shadowColor="@color/keyboard_shadow_color"
+      android:shadowRadius="0"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toRightOf="parent"
+      ></com.anrongtec.idinputmethod.IDInputMethod>
+
+
+</android.support.constraint.ConstraintLayout>
