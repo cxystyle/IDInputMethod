@@ -1,5 +1,25 @@
 # IDInputMethod
-自定义身份证输入法
+自定义身份证输入法, 默认限制输入长度和数字，
+
+![](https://github.com/cxystyle/IDInputMethod/blob/master/images/demo1.jpg)
+
+## 引用
+
+Step 1. Add the JitPack repository to your build file
+Add it in your root build.gradle at the end of repositories:
+
+	allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+  
+Step 2. Add the dependency
+
+	dependencies {
+	        implementation 'com.github.cxystyle:IDInputMethod:1.0.0'
+	}
 
 
 ## 使用EditText的食用方法
@@ -34,12 +54,12 @@
 ```
 
 ```java
+//获取输入法控件，添加EditText即可快速集成
 IDInputMethod idInputView = findViewById(R.id.idinputview);
 IDInputEditText idInputEditText = findViewById(R.id.et);
 
 //推荐使用封装好了的IDInputEditText， 继承自AppCompatEditText,所以和使用EditText没有任何区别
 idInputView.addEditText(idInputEditText);
-
 //或者使用默认的edittext
 idInputView.addEditText(editText);
 
