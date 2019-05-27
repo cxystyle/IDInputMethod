@@ -1,3 +1,7 @@
 <resources>
   <string name="app_name">IDInputMethodLibrary</string>
+  <string name="error">身份证号码错误</string>
+
+
+
 </resources>

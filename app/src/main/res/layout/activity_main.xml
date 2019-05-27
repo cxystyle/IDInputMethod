@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.test.idinputmethod.MainActivity"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     >
 
-  <com.anrongtec.idinputmethod.IDInputEditText
+  <com.cxystyle.idinputmethod.IDInputEditText
       android:id="@+id/et"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      android:hint="IDInputEditText : IDInputMethod"
       />
 
   <EditText
@@ -19,6 +24,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toBottomOf="@+id/et"
+      android:hint="EditText : IDInputMethod"
 
       />
   <EditText
@@ -26,9 +32,10 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toBottomOf="@+id/et2"
+      android:hint="EditText : 默认输入法"
       />
 
-  <com.anrongtec.idinputmethod.IDInputMethod
+  <com.cxystyle.idinputmethod.IDInputMethod
       android:id="@+id/idinputview"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -44,7 +51,7 @@
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
-      ></com.anrongtec.idinputmethod.IDInputMethod>
+      ></com.cxystyle.idinputmethod.IDInputMethod>
 
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
