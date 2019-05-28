@@ -4,22 +4,19 @@
 ![](https://github.com/cxystyle/IDInputMethod/blob/master/images/demo1.jpg)
 
 ## 引用
+
 ```gradle
-Step 1. Add the JitPack repository to your build file
-Add it in your root build.gradle at the end of repositories:
 
-	allprojects {
-		repositories {
-			...
-			maven { url 'https://jitpack.io' }
-		}
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
 	}
-  
-Step 2. Add the dependency
+}
 
-	dependencies {
-	        implementation 'com.github.cxystyle:IDInputMethod:1.0.0'
-	}
+dependencies {
+	implementation 'com.github.cxystyle:IDInputMethod:1.0.0'
+}
 
 ```
 ## 使用EditText的食用方法
@@ -69,5 +66,32 @@ idInputView.addEditText(editText);
 ```
 
 ## 使用其他或者自定义view的食用方法
-稍后加，下班了
 
+```java
+    //调用addView 添加控件
+    idInputView.addView(tv);
+    idInputView.addView(tv2);
+    
+    //添加监听，通过回调方法自己设置输入的内容
+    idInputView.addInputListener(new InputCallback<TextView>() {
+      @Override
+      public boolean input(Character input, int primaryCode, TextView view) {
+        String s = view.getText().toString();
+        if (primaryCode == Keyboard.KEYCODE_DELETE) {
+          //删除按钮
+          if (!TextUtils.isEmpty(s) && s.length() > 1) {
+            view.setText(s.substring(0, s.length() - 1));
+          } else {
+            view.setText("");
+          }
+        } else if (primaryCode == Keyboard.KEYCODE_DONE) {
+          //确定按钮
+        } else {
+          //1-9 X
+          view.setText(s + (input == null ? "" : input));
+        }
+        //返回值：true则表示自己重写所有按键效果， false则表示继续调用默认按键效果
+        return false;
+      }
+    });
+```
