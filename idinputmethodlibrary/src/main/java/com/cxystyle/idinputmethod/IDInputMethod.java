@@ -17,7 +17,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -35,7 +34,7 @@ import java.util.List;
  * @author cxy
  * @data 2018-12-27
  */
-public class IDInputMethod extends KeyboardView implements IInputMethod {
+public class IDInputMethod<T extends View> extends KeyboardView implements IInputMethod {
 
     private static final String DIGITS = "0123456789Xx";
 
@@ -53,9 +52,15 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
 
     private EditText mEditText;
 
+    private T mView;
+
     private int focusStart, focusEnd;
 
     private boolean showError;
+
+    private InputCallback callback;
+
+    private Context mContext;
 
     public IDInputMethod(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -74,6 +79,8 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
     }
 
     private void init(Context context) {
+        mContext = context;
+
         keyEnableBackground =
                 ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.key_background, null);
         keyDisableBackground =
@@ -107,35 +114,43 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
 
             @Override
             public void onKey(int primaryCode, int[] keyCodes) {
-                if (mEditText == null) {
+
+                if (callback != null && mView != null) {
+                    if (callback.input(primaryCode < 0 ? null : (char) primaryCode, primaryCode, mView)) {
+                        return;
+                    }
+                }
+
+                if (primaryCode == Keyboard.KEYCODE_CANCEL || primaryCode == Keyboard.KEYCODE_DONE) {
+                    setVisibility(View.GONE);
                     return;
                 }
-                int focusPosition = mEditText.getSelectionStart();
-                int focusEndPosition = mEditText.getSelectionEnd();
-                Editable editable = mEditText.getText();
-                switch (primaryCode) {
-                    case Keyboard.KEYCODE_DELETE:
-                        if (editable != null && editable.length() > 0) {
-                            if (focusEndPosition > focusPosition) {
-                                editable.delete(focusPosition, focusEndPosition);
-                            } else if (focusPosition > 0) {
-                                editable.delete(focusPosition - 1, focusPosition);
+
+                if (mEditText != null) {
+
+                    int focusPosition = mEditText.getSelectionStart();
+                    int focusEndPosition = mEditText.getSelectionEnd();
+                    Editable editable = mEditText.getText();
+                    switch (primaryCode) {
+                        case Keyboard.KEYCODE_DELETE:
+                            if (editable != null && editable.length() > 0) {
+                                if (focusEndPosition > focusPosition) {
+                                    editable.delete(focusPosition, focusEndPosition);
+                                } else if (focusPosition > 0) {
+                                    editable.delete(focusPosition - 1, focusPosition);
+                                }
                             }
-                        }
-                        break;
-                    case Keyboard.KEYCODE_CANCEL:
-                        setVisibility(View.GONE);
-                        break;
-                    case Keyboard.KEYCODE_DONE:
-                        setVisibility(View.GONE);
-                        break;
-                    case KEY_X_CODE:
-                        if (!isLastOneToInput()) {
-                            return;
-                        }
-                    default:
-                        editable.insert(focusPosition, Character.toString(((char) primaryCode)));
-                        break;
+                            break;
+                        case KEY_X_CODE:
+                            if (!isLastOneToInput()) {
+                                return;
+                            }
+                        default:
+                            if (editable != null) {
+                                editable.insert(focusPosition, Character.toString(((char) primaryCode)));
+                            }
+                            break;
+                    }
                 }
             }
 
@@ -166,11 +181,9 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
         });
     }
 
-    //  @Override
-    public void attachEditText(EditText editText) {
-        mEditText = editText;
 
-        hideSoftInput();
+    private void attachEditText(EditText editText) {
+        mEditText = editText;
 
         setEditText(editText);
 
@@ -181,10 +194,21 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
         invalidate();
     }
 
-    //  @Override
-    public void detachEditText(EditText editText) {
+    private void detachEditText(EditText editText) {
+        mEditText = null;
         hide();
     }
+
+    private void attachView(T view) {
+        mView = view;
+        show();
+    }
+
+    private void detachView() {
+        mView = null;
+        hide();
+    }
+
 
     @Override
     public void addEditText(final EditText editText) {
@@ -200,13 +224,42 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
         });
     }
 
-    private void show() {
+
+    public void addView(final T view) {
+        view.setFocusable(true);
+        view.setFocusableInTouchMode(true);
+//        view.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (v.hasFocus()){
+//                    v.clearFocus();
+//                }else{
+//                    v.requestFocus();
+//                }
+//            }
+//        });
+        view.setClickable(true);
+        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    attachView(view);
+                } else {
+                    detachView();
+                }
+            }
+        });
+    }
+
+
+    public void show() {
         if (getVisibility() != View.VISIBLE) {
             setVisibility(View.VISIBLE);
         }
+        hideSoftInput();
     }
 
-    private void hide() {
+    public void hide() {
         if (getVisibility() != View.GONE) {
             setVisibility(View.GONE);
         }
@@ -231,19 +284,9 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
             public void afterTextChanged(Editable s) {
                 inputLength = s.length();
 
-                showError(s.toString());
+//                showError(s.toString());
 
                 invalidate();
-            }
-        });
-
-        editText.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (editText.hasFocus()) {
-                    show();
-                }
-                return false;
             }
         });
 
@@ -261,25 +304,6 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
             focusStart = MAX_INPUT_LENGTH - 1;
         }
     }
-
-    /**
-     * @param input
-     */
-    private void showError(String input) {
-        if (showError) {
-            if (input.length() == 18) {
-                if (!Utils.checkIDNo(input)) {
-                    mEditText.setError(mEditText.getContext().getString(R.string.error));
-                }
-            } else {
-                mEditText.setError(null);
-            }
-        }
-    }
-
-    //private void toast(String str) {
-    //  Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
-    //}
 
     private void setShowSoftInputOnFocus() {
         if (android.os.Build.VERSION.SDK_INT <= 10) {//4.0以下
@@ -303,7 +327,7 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
     private void hideSoftInput() {
         ((InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE))
                 .hideSoftInputFromWindow(
-                        ((Activity) mEditText.getContext()).getCurrentFocus().getWindowToken(),
+                        ((Activity) mContext).getCurrentFocus().getWindowToken(),
                         InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
@@ -360,6 +384,9 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
      * 条件为 已输入17个数字，并且光标在最后
      */
     private boolean isLastOneToInput() {
+        if (mEditText == null) {
+            return true;
+        }
         return MAX_INPUT_LENGTH - 1 == inputLength ? (focusStart == MAX_INPUT_LENGTH - 1 ? true : false)
                 : false;
     }
@@ -386,8 +413,25 @@ public class IDInputMethod extends KeyboardView implements IInputMethod {
         return label;
     }
 
+//    public void showError(boolean showError) {
+//        this.showError = showError;
+//    }
+//    /**
+//     * @param input
+//     */
+//    private void showError(String input) {
+//        if (showError) {
+//            if (input.length() == 18) {
+//                if (!Utils.checkIDNo(input)) {
+//                    mEditText.setError(mEditText.getContext().getString(R.string.error));
+//                }
+//            } else {
+//                mEditText.setError(null);
+//            }
+//        }
+//    }
 
-    public void showError(boolean showError) {
-        this.showError = showError;
+    public void addInputListener(InputCallback callback) {
+        this.callback = callback;
     }
 }

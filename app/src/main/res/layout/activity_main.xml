@@ -24,9 +24,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       app:layout_constraintTop_toBottomOf="@+id/et"
-      android:hint="EditText : IDInputMethod"
+      android:hint="EditText : IDInputMethod" />
 
-      />
   <EditText
       android:id="@+id/et3"
       android:layout_width="match_parent"
@@ -34,6 +33,32 @@
       app:layout_constraintTop_toBottomOf="@+id/et2"
       android:hint="EditText : 默认输入法"
       />
+
+  <TextView
+      android:id="@+id/tv"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
+      android:background="@drawable/selector_tv_bg"
+      android:focusable="true"
+      android:focusableInTouchMode="true"
+      android:gravity="center_vertical"
+      android:padding="8dp"
+      android:text="TextView1"
+      app:layout_constraintTop_toBottomOf="@+id/et3" />
+
+
+  <TextView
+      android:id="@+id/tv2"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
+      android:layout_marginTop="8dp"
+      android:background="@drawable/selector_tv_bg"
+      android:focusable="true"
+      android:focusableInTouchMode="true"
+      android:gravity="center_vertical"
+      android:padding="8dp"
+      android:text="TextView2"
+      app:layout_constraintTop_toBottomOf="@+id/tv" />
 
   <com.cxystyle.idinputmethod.IDInputMethod
       android:id="@+id/idinputview"
